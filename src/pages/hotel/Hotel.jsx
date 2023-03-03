@@ -1,37 +1,60 @@
 import { faCircleArrowLeft, faCircleArrowRight, faCircleXmark, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import Footer from "../../components/footer/Footer";
 import Header from "../../components/header/Header";
 import MailList from "../../components/mailList/MailList";
 import Navbar from "../../components/navbar/Navbar";
+import { SearchContext } from "../../context/SearchContext";
+import useFetch from "../../hooks/useFetch";
 import "./hotel.css"
 
 const Hotel = () => {
 
+    const location = useLocation()
+    const id = location.pathname.split("/")[2]
+
     const [slideNumber, setSlideNumber] = useState(0)
     const [open, setOpen] = useState(false)
 
-    const photos = [
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-        {
-            src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
-        },
-    ]
+    const {data, loading, error} = useFetch(`/hotels/find${id}`)
+
+    const {dates, options} = useContext(SearchContext)
+
+    // console.log(dates)
+
+    const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24
+
+    function dayDifference(date1, date2){
+        const timeDiff = Math.abs(date2.getTime() - date1.getTime())
+        const diffDays = Math.ceil(timeDiff / MILLISECONDS_PER_DAY)
+        return diffDays
+    }
+
+    const daysDiff = dayDifference(dates[0].endDate, dates[0].startDate)
+
+
+    // const photos = [
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    //     {
+    //         src:"https://cf.bstatic.com/xdata/images/hotel/square600/87428762.webp?k=9a065fcd92168145d8c8358701662c76793535597b678efc8f6921c8e3c188e6&o=&s=1"
+    //     },
+    // ]
 
     const handleOpen =(i) => {
         setSlideNumber(i);
@@ -54,46 +77,45 @@ const Hotel = () => {
     <div>
         <Navbar/>
         <Header type="list"/>
-        <div className="hotelContainer">
-            {open && <div className="slider">
+        { loading ? "loading" : <div className="hotelContainer">
+            {open && (<div className="slider">
                 <FontAwesomeIcon icon={faCircleXmark} className="close" onClick={()=>setOpen(false)}/>
                 <FontAwesomeIcon icon={faCircleArrowLeft} className="arrow" onClick={()=> handleMove("l")} />
                 <div className="sliderWrapper">
-                    <img src={photos[slideNumber].src} alt="" className="sliderImg" />
+                    <img src={data.photos[slideNumber]} alt="" className="sliderImg" />
                 </div>
                 <FontAwesomeIcon icon={faCircleArrowRight} className="arrow" onClick={()=> handleMove("r")}/>
-            </div>}
+            </div>)}
             <div className="hotelWrapper">
                 <button className="bookNow">Reserve or Book Now!</button>
 
-                <h1 className="hotelTitle">Grand Hotel</h1>
+                <h1 className="hotelTitle">{data.name}</h1>
                 <div className="hotelAddress">
                     <FontAwesomeIcon icon={faLocationDot}/>
-                    <span>Elton St 125 New York</span>
+                    <span>{data.address}</span>
                 </div>
-                <span className="hotelDistance">Excellent location - 500m from center</span>
-                <span className="hotelPriceHighlight">Book a stay over $114 at this property and get a free airport taxi</span>
+                <span className="hotelDistance">Excellent location - {data.distance}m from center</span>
+                <span className="hotelPriceHighlight">Book a stay over ${data.cheapestPrice} at this property and get a free airport taxi</span>
                 <div className="hotelImages">   
-                    {photos.map((photo, i)=>(
+                    {data.photos?.map((photo, i)=>(
                         <div className="hotelImgWrapper">
-                            <img src={photo.src} onClick={()=>handleOpen(i)} alt="" className="hotelImg" />
+                            <img src={photo} onClick={()=>handleOpen(i)} alt="" className="hotelImg" />
                         </div>
                     ))}
                 </div>
                 <div className="hotelDetails">
                     <div className="hotelDetailsTexts">
-                        <h1 className="hotelTitle">Stay in the heart of Krakov</h1>
+                        <h1 className="hotelTitle">{data.title}</h1>
                         <p className="hotelDesc">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus eius porro soluta aspernatur eveniet non, totam nam quia? Quis necessitatibus mollitia pariatur at consequuntur nobis, ipsa, neque eligendi alias sint consectetur voluptatibus reprehenderit consequatur ullam fugit. Eveniet corrupti nam facere, deserunt dolores commodi officia soluta totam quae sint tempore libero nesciunt incidunt veritatis tenetur voluptas beatae dicta officiis dolore nisi dignissimos eaque et. Aut, officiis, nesciunt cupiditate asperiores magni illum iusto fuga tenetur consequuntur explicabo quos totam eaque esse ex laudantium similique sed unde id placeat quae soluta consectetur vero. Dignissimos enim sunt id inventore adipisci in debitis deleniti unde!
-                        </p>
+                            {data.desc}                        </p>
                     </div>
                     <div className="hotelDetailsPrice">
-                        <h1>  Perfect for a 9-night stay!</h1>
+                        <h1>  Perfect for a {daysDiff}-night stay!</h1>
                         <span>
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum ipsa eius accusantium a, esse ab laudantium sit illum!
                         </span>
                         <h2>
-                            <b>$945</b> (9 nights)
+                            <b>${daysDiff * data.cheapestPrice * options.room}</b> ({daysDiff} nights)
                         </h2>
                         <button>Reserve or Book Now!</button>
                     </div>
@@ -101,7 +123,7 @@ const Hotel = () => {
             </div>
             <MailList/>
             <Footer/>
-        </div>
+        </div>}
     </div> );
 }
  
