@@ -1,9 +1,10 @@
 .login{
-
-width: 320px;
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color:lightslategrey
 }
-
-
 
 .lContainer{
     display: flex;
@@ -13,7 +14,8 @@ width: 320px;
 
 .lInput{
     height: 30px;
-    padding: 10px;
+    padding: 10px 50px;
+    border: none;
 }
 
 .lButton{

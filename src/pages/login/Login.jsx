@@ -35,7 +35,7 @@ const Login = () => {
         <div className="lContainer">
             <input type="text" placeholder="username" id="username" onChange={handleChange} className="lInput" />
             <input type="password" placeholder="password" id="password" onChange={handleChange} className="lInput" />
-            <button disbled={loading} className="lButton" onClick={handleClick}>Login</button>
+            <button disabled={loading} className="lButton" onClick={handleClick}>Login</button>
             {error && <span>{error.message}</span>}
         </div>
     </div> );

@@ -1,22 +1,30 @@
 import { faCircleArrowLeft, faCircleArrowRight, faCircleXmark, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Footer from "../../components/footer/Footer";
 import Header from "../../components/header/Header";
 import MailList from "../../components/mailList/MailList";
 import Navbar from "../../components/navbar/Navbar";
+import Reserve from "../../components/reserve/Reserve";
+import { AuthContext } from "../../context/AuthContext";
 import { SearchContext } from "../../context/SearchContext";
 import useFetch from "../../hooks/useFetch";
 import "./hotel.css"
 
 const Hotel = () => {
 
+    const {user} = useContext(AuthContext)
+    const navigate =useNavigate()
+
+
     const location = useLocation()
     const id = location.pathname.split("/")[2]
 
     const [slideNumber, setSlideNumber] = useState(0)
     const [open, setOpen] = useState(false)
+
+    const [openRoomModal, setOpenRoomModal] = useState(false)
 
     const {data, loading, error} = useFetch(`/hotels/find${id}`)
 
@@ -73,6 +81,14 @@ const Hotel = () => {
         setSlideNumber(newSlideNumber)
     }
 
+    const handleClick = () =>{
+        if(user){
+            setOpenRoomModal(true)
+        } else{
+            navigate("/login")
+        }
+    }
+
     return (
     <div>
         <Navbar/>
@@ -117,13 +133,14 @@ const Hotel = () => {
                         <h2>
                             <b>${daysDiff * data.cheapestPrice * options.room}</b> ({daysDiff} nights)
                         </h2>
-                        <button>Reserve or Book Now!</button>
+                        <button onClick={handleClick}>Reserve or Book Now!</button>
                     </div>
                 </div>
             </div>
             <MailList/>
             <Footer/>
         </div>}
+        {openRoomModal && <Reserve setOpen={setOpenRoomModal} hotelId={id} /> }
     </div> );
 }
  
