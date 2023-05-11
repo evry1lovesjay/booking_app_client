@@ -4,7 +4,7 @@ const INITIAL_STATE = {
     city: undefined,
     dates: [],
     options:{
-        adullt: undefined,
+        adult: undefined,
         children: undefined,
         room: undefined,
     }
